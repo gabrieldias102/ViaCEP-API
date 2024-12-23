@@ -3,4 +3,5 @@ export interface Address {
   bairro: string;
   localidade: string;
   uf: string;
+  erro?: boolean;
 }
