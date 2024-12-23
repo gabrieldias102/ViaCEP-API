@@ -1,4 +1,4 @@
-export interface Address {
+export interface Favorite {
   cep: number;
   logradouro: string;
   bairro: string;
