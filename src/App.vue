@@ -9,55 +9,54 @@
 
       <p v-if="error" class="text-red-500 mt-4 text-center">{{ error }}</p>
 
-      <AddressDisplay v-if="address" :address="address" />
+      <div>
+        <AddressDisplay
+          v-if="address"
+          :address="address"
+          @add-favorite="favoritesBoxRef.addFavorite"
+        />
+        <FavoritesBox ref="favoritesBoxRef" />
+      </div>
     </div>
   </div>
 </template>
 
-<script lang="ts">
-import { defineComponent, ref } from "vue";
+<script setup lang="ts">
+import { ref } from "vue";
 import { cepService } from "./services/cepService";
 import CepForm from "./components/CepForm.vue";
 import AddressDisplay from "./components/AddressDisplay.vue";
+import FavoritesBox from "./components/FavoritesBox.vue";
 import type { Address } from "./types/address";
 
-export default defineComponent({
-  components: {
-    CepForm,
-    AddressDisplay,
-  },
-  setup() {
-    const address = ref<Address | null>(null);
-    const error = ref("");
+const address = ref<Address | null>(null);
+const error = ref("");
+const favoritesBoxRef = ref();
 
-    const fetchAddress = async (cep: string) => {
-      error.value = "";
-      address.value = null;
+const fetchAddress = async (cep: string) => {
+  error.value = "";
+  address.value = null;
 
-      const cepPattern = /^[0-9]{8}$/;
-      if (!cepPattern.test(cep)) {
-        error.value = "CEP inválido! Insira 8 números.";
-        return;
-      }
+  const cepPattern = /^[0-9]{8}$/;
+  if (!cepPattern.test(cep)) {
+    error.value = "CEP inválido! Insira 8 números.";
+    return;
+  }
 
-      try {
-        const data = await cepService.fetchAddress(cep);
-        if (data.erro) {
-          error.value = "CEP não encontrado!";
-        } else {
-          address.value = data;
-        }
-      } catch (err) {
-        error.value = "Erro ao buscar o CEP!";
-      }
-    };
+  try {
+    const data = await cepService.fetchAddress(cep);
+    if (data.erro) {
+      error.value = "CEP não encontrado!";
+    } else {
+      address.value = data;
+    }
+  } catch (err) {
+    error.value = "Erro ao buscar o CEP!";
+  }
+};
 
-    const clearFilters = () => {
-      address.value = null;
-      error.value = "";
-    };
-
-    return { address, error, fetchAddress, clearFilters };
-  },
-});
+const clearFilters = () => {
+  address.value = null;
+  error.value = "";
+};
 </script>
